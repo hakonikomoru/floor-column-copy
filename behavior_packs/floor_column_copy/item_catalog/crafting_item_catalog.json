@@ -1,0 +1,22 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:crafting_items_catalog": {
+    "categories": [
+      {
+        "category_name": "equipment",
+        "groups": [
+          {
+            "group_identifier": {
+              "icon": "floor_column_copy:copy_wand",
+              "name": "floor_column_copy:itemGroup.name.wands"
+            },
+            "items": [
+              "floor_column_copy:copy_wand",
+              "floor_column_copy:paste_wand"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

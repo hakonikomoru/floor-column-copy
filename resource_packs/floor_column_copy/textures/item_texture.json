@@ -1,0 +1,12 @@
+{
+  "resource_pack_name": "floor_column_copy",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "floor_column_copy_copy_wand": {
+      "textures": "textures/items/copy_wand"
+    },
+    "floor_column_copy_paste_wand": {
+      "textures": "textures/items/paste_wand"
+    }
+  }
+}

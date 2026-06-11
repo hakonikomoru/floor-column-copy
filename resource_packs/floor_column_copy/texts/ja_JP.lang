@@ -1,0 +1,3 @@
+item.floor_column_copy:copy_wand.name=コピーの杖
+item.floor_column_copy:paste_wand.name=貼り付けの杖
+floor_column_copy:itemGroup.name.wands=Floor Column Copy

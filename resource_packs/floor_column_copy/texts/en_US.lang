@@ -1,0 +1,3 @@
+item.floor_column_copy:copy_wand.name=Floor Copy Wand
+item.floor_column_copy:paste_wand.name=Floor Paste Wand
+floor_column_copy:itemGroup.name.wands=Floor Column Copy

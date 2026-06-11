@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.10",
+  "minecraft:item": {
+    "description": {
+      "identifier": "floor_column_copy:copy_wand",
+      "menu_category": {
+        "category": "equipment",
+        "group": "floor_column_copy:itemGroup.name.wands"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "floor_column_copy_copy_wand"
+        }
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": true,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.1,
+        "movement_modifier": 1.0
+      },
+      "minecraft:cooldown": {
+        "category": "floor_column_copy_copy_wand",
+        "duration": 0.5
+      },
+      "minecraft:display_name": {
+        "value": "item.floor_column_copy:copy_wand.name"
+      }
+    }
+  }
+}
