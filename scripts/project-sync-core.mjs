@@ -216,7 +216,7 @@ export function generateFcGameRulesMarkdown(spec, menuActions, mcFunctions = [])
     "### 初回配布",
     "",
     "- 初回スポーン時にコピーの杖・貼り付けの杖を自動配布（`fc:starter_given` で再配布を抑制）",
-    "- クリエイティブ装備タブ **Floor Column Copy** からも取得可",
+    "- クリエイティブアイテムタブ **Floor Column Copy** からも取得可",
     "",
     "### ヘルプ文言（CONFIG.messages.help）",
     "",

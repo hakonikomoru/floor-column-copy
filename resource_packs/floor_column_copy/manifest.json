@@ -4,7 +4,7 @@
     "name": "Floor Column Copy",
     "description": "Resources for Floor Column Copy addon.",
     "uuid": "f4a5b6c7-d8e9-4fa1-2b3c-4d5e6f7a8b9c",
-    "version": [1, 0, 2],
+    "version": [1, 0, 3],
     "min_engine_version": [1, 21, 0]
   },
   "metadata": {
@@ -14,7 +14,7 @@
     {
       "type": "resources",
       "uuid": "f5a6b6c7-d8e9-4fb2-3c4d-5e6f7a8b9c0d",
-      "version": [1, 0, 2]
+      "version": [1, 0, 3]
     }
   ]
 }

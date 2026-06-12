@@ -1,6 +1,6 @@
 export const CONFIG = {
   namespace: "floor_column_copy",
-  packVersion: "1.0.2",
+  packVersion: "1.0.3",
   items: {
     copyWand: "floor_column_copy:copy_wand",
     pasteWand: "floor_column_copy:paste_wand",
@@ -28,7 +28,7 @@ export const CONFIG = {
     giveDone: "コピーの杖と貼り付けの杖を付与しました",
     help: [
       "使い方: コピーの杖で高さを選び、貼り付けの杖で即貼り付け",
-      "杖の入手: クリエイティブ装備タブ / /function fc/give / /fc:give",
+      "杖の入手: クリエイティブアイテムタブ / /function fc/give / /fc:give",
       "メニュー: コピーの杖を使用 / /function fc/menu / /fc:menu",
     ],
   },

@@ -3,7 +3,7 @@
   "minecraft:crafting_items_catalog": {
     "categories": [
       {
-        "category_name": "equipment",
+        "category_name": "items",
         "groups": [
           {
             "group_identifier": {

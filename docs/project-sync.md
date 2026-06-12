@@ -4,7 +4,7 @@
 > 人間向けの概要は [README.md](../README.md)、Launcher 手順は [bedrock-dev-notes.md](./bedrock-dev-notes.md)。
 
 <!-- sync:auto:meta:start -->
-最終更新の想定リポジトリ: `hakonikomoru/floor-column-copy`（`main`・`57e0611`・2026-06-12・`npm run sync:project-docs` 自動反映）
+最終更新の想定リポジトリ: `hakonikomoru/floor-column-copy`（`main`・`f4d0626`・2026-06-12・`npm run sync:project-docs` 自動反映）
 <!-- sync:auto:meta:end -->
 
 ---
@@ -142,17 +142,17 @@ floor-column-copy/
 ### 初回配布
 
 - 初回スポーン時にコピーの杖・貼り付けの杖を自動配布（`fc:starter_given` で再配布を抑制）
-- クリエイティブ装備タブ **Floor Column Copy** からも取得可
+- クリエイティブアイテムタブ **Floor Column Copy** からも取得可
 
 ### ヘルプ文言（CONFIG.messages.help）
 
 - 使い方: コピーの杖で高さを選び、貼り付けの杖で即貼り付け
-- 杖の入手: クリエイティブ装備タブ / /function fc/give / /fc:give
+- 杖の入手: クリエイティブアイテムタブ / /function fc/give / /fc:give
 - メニュー: コピーの杖を使用 / /function fc/menu / /fc:menu
 
 ### パックバージョン
 
-- script 表示: `1.0.2`
+- script 表示: `1.0.3`
 <!-- sync:auto:game-rules:end -->
 
 ---

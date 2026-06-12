@@ -43,7 +43,7 @@ A Bedrock Edition building utility that copies a vertical column of blocks **dow
 
 - **対応環境:** Minecraft 統合版（Bedrock）1.21 以降
 - **操作:** コピーの杖 / 貼り付けの杖（Beta APIs 不要）
-- **補助:** `/fc:give` `/function fc/give` クリエイティブ装備タブ
+- **補助:** `/fc:give` `/function fc/give` クリエイティブアイテムタブ
 
 制作: **komolab - こもらぼ -**
 

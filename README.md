@@ -44,7 +44,7 @@ Minecraft Bedrock Edition 向け Script API アドオンです。
 ### 1. 杖の入手
 
 - **初回ワールド参加時**に自動配布
-- **クリエイティブ** → 装備タブ → **Floor Column Copy**
+- **クリエイティブ** → アイテムタブ → **Floor Column Copy**
 - `/fc:give` または `/function fc/give`（チート ON）
 
 ### 2. コピー
