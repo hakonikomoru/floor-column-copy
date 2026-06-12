@@ -14,6 +14,10 @@ export function pasteColumn(player) {
   }
 
   const dimension = player.dimension;
+  if (clipboard.dimensionId !== dimension.id) {
+    player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.dimensionMismatch}`);
+  }
+
   const { x, y: startY, z } = getFootBlockLocation(player);
   const minY = getWorldMinY(dimension);
   let pasted = 0;
@@ -32,13 +36,16 @@ export function pasteColumn(player) {
       block.setPermutation(clipboard.permutations[offset]);
       pasted += 1;
     } catch (error) {
-      console.warn(
-        `[FC] paste skipped at y=${y}: ${error?.message ?? error}`,
-      );
+      console.warn(`[FC] paste skipped at y=${y}: ${error?.message ?? error}`);
       break;
     }
   }
 
-  player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.pasteDone(pasted)}`);
+  const total = clipboard.permutations.length;
+  const message =
+    pasted < total
+      ? CONFIG.messages.pastePartial(pasted, total)
+      : CONFIG.messages.pasteDone(pasted);
+  player.sendMessage(`${CONFIG.messages.prefix} ${message}`);
   return pasted;
 }

@@ -1,0 +1,1 @@
+scriptevent fc:help run

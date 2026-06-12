@@ -27,8 +27,15 @@ function checkPackRoot(label, packRoot, kind) {
   let ok = true;
   const required =
     kind === "behavior"
-      ? ["manifest.json", "scripts/main.js", "scripts/ui.js"]
-      : ["manifest.json", "textures/item_texture.json"];
+      ? [
+          "manifest.json",
+          "pack_icon.png",
+          "scripts/main.js",
+          "scripts/ui.js",
+          "functions/fc/give.mcfunction",
+          "functions/fc/menu.mcfunction",
+        ]
+      : ["manifest.json", "pack_icon.png", "textures/item_texture.json"];
 
   for (const rel of required) {
     const path = join(packRoot, rel);

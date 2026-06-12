@@ -1,80 +1,63 @@
-# 統合版（Bedrock）開発・動作確認メモ
+# 統合版（Bedrock）動作確認メモ
 
-> Minecraft **Launcher（統合版）** での開発手順。動作確認・トラブルシュート時は README の前にここを読む。
+> Minecraft **Launcher（統合版）** での導入・確認手順。
 
 ---
 
-## 1. データフォルダ（Launcher 版）
+## 1. インストール（プレイ用）
 
-| 起動方法 | パック置き場（Windows） |
-| --- | --- |
-| **Launcher（本プロジェクト想定）** | `%APPDATA%\Minecraft Bedrock\Users\Shared\games\com.mojang\` |
-| Store 直起動（参考） | `%LOCALAPPDATA%\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\LocalState\games\com.mojang\` |
+1. `behavior_packs/floor_column_copy` と `resource_packs/floor_column_copy` を Launcher の `com.mojang` に置く  
+   （または `npm run install:bedrock-pack` でジャンクション）
+2. ワールド設定で **ビヘイビア＋リソース両方** の **Floor Column Copy** を有効化
+3. ワールドに入る → 初回スポーン時に杖が自動配布される
 
-- ワールドは `Users\<アカウントID>\games\com.mojang\minecraftWorlds\<ID>\` にあることもある。
-- パック適用は `world_behavior_packs.json` / `world_resource_packs.json` の UUID（`manifest.json` の `header.uuid`）で紐づく。
+**開発用パック（development_behavior_packs）は不要です。** 通常の behavior / resource パックだけで動きます。
 
-### 開発用：ジャンクションでリポジトリ直結
+### Launcher のパス（Windows）
 
-コピーせず、編集を即反映する:
-
-```bash
-npm run install:bedrock-pack
+```
+%APPDATA%\Minecraft Bedrock\Users\Shared\games\com.mojang\
 ```
 
-PowerShell で `npm` が実行ポリシーで拒否される場合は **`npm.cmd run install:bedrock-pack`** または **`node scripts/install-bedrock-pack.mjs`** を使う。
-
-`install:bedrock-pack` は **Shared と各アカウント** の次の 4 箇所へジャンクションを張る:
-
-- `behavior_packs/floor_column_copy`
-- `development_behavior_packs/floor_column_copy`
-- `resource_packs/floor_column_copy`
-- `development_resource_packs/floor_column_copy`
+アカウント別フォルダ（`Users\<ID>\games\com.mojang\`）を使っている場合は、そちらにも同様に配置してください。
 
 ---
 
-## 2. ワールド設定（必須）
+## 2. 操作の優先順（Beta APIs 不要）
 
-| 設定 | 理由 |
-| --- | --- |
-| ビヘイビアパック **Floor Column Copy** | スクリプト本体 |
-| リソースパック **Floor Column Copy** | 杖テクスチャ・メニューアイコン |
-| **Beta APIs**（実験的機能） | `!fc` チャットコマンド（`chatSend`）に必要 |
-| チート ON（推奨） | クリエイティブでのテストが楽 |
+| 優先 | 方法 | 入力 |
+| --- | --- | --- |
+| ① | **杖** | コピー/貼り付けの杖を使用（空中・ブロック上どちらでも可） |
+| ② | **カスタムコマンド** | `/fc:give` `/fc:menu` `/fc:paste`（ゲーム 1.21.80 以降） |
+| ③ | **関数** | `/function fc/give` など（チート ON） |
+| ④ | **scriptevent** | `/scriptevent fc:give run`（チート ON） |
+| ⑤ | **チャット** | `!fc give`（**Beta APIs** が必要） |
 
-- 実験的機能は **ワールド作成時に ON** が確実。後から付けた場合は **新規ワールド** を検討。
-- スクリプトやテクスチャを直したあとは **ワールド退出 → 再入場**（できればゲーム再起動）。
-
-### パック説明が更新されないとき
-
-1. `npm run sync:bedrock-world-pack`（該当ワールドの `world_*_packs.json` の version も同期）
-2. **`manifest.json` の `header.version` を上げる**（behavior / resource 両方）
-3. **マイクラを完全終了**
-4. まだ古い場合: ワールド設定でパックを **一度 OFF → ON**
+杖の使用と `/fc:*` / `/function fc/*` だけで完結します。Beta APIs は `!fc` チャットを使いたい場合のみ必要です。
 
 ---
 
-## 3. 開発コマンド
+## 3. リポジトリ開発者向け
 
 | npm スクリプト | 内容 |
 | --- | --- |
-| `npm run install:bedrock-pack` | Launcher の各 `com.mojang` へジャンクション作成 |
-| `npm run verify:bedrock-pack` | リポジトリと配置先のパックを確認 |
-| `npm run sync:bedrock-world-pack` | パック適用済みワールドへコピー同期 |
+| `npm run install:bedrock-pack` | Launcher へジャンクション作成 |
+| `npm run verify:bedrock-pack` | 配置確認 |
+| `npm run sync:bedrock-world-pack` | 適用済みワールドへコピー同期 |
 | `npm run dev:bedrock` | ファイル監視 → 自動同期 |
 
-`sync:bedrock-world-pack` / `dev:bedrock` は、ワールド設定で **Floor Column Copy** を一度適用したあとで使う。
+`sync` / `dev:bedrock` はスクリプト編集を即反映したいときだけ使います。通常プレイでは不要です。
 
 ---
 
-## 4. 動作確認
+## 4. 動作確認チェックリスト
 
-1. `npm run install:bedrock-pack`
-2. 新規ワールド（Beta APIs ON）→ ビヘイビア＋リソース両方を適用
-3. ワールド入室 → チャットで `!fc give`
-4. コピーの杖でメニュー、貼り付けの杖で設置
-
-コンテンツログ（設定 → 作成者 → 有効化）に `[FC] Floor Column Copy loaded` が出ればスクリプト読み込み OK。
+| 確認 | OK の目安 |
+| --- | --- |
+| スクリプト起動 | コンテンツログに `[FC] Floor Column Copy loaded` |
+| 杖の配布 | 初回スポーン or `/fc:give` で 2 種の杖 |
+| コピー | コピーの杖 → 高さメニュー → `コピー完了：Nブロック` |
+| 貼り付け | 貼り付けの杖 → `貼り付け完了：Nブロック` |
 
 ---
 
@@ -82,19 +65,23 @@ PowerShell で `npm` が実行ポリシーで拒否される場合は **`npm.cmd
 
 | 症状 | 対処 |
 | --- | --- |
-| パックが一覧に出ない | `npm run install:bedrock-pack` → Launcher 再起動 |
-| `!fc` が効かない | Beta APIs を ON |
-| 杖の見た目がおかしい | リソースパックも有効化しているか確認 |
-| 編集が反映されない | `npm run sync:bedrock-world-pack` または `dev:bedrock`、ゲーム再起動 |
-| 何も反応しない | コンテンツログで Script エラーを確認 |
+| 何も反応しない | ビヘイビア＋リソース両方を有効化。マイクラ再起動 |
+| 杖が出ない | `/fc:give` または `/function fc/give` |
+| メニューが出ない | コンテンツログで Script エラーを確認 |
+| 編集が反映されない | manifest の version を上げてパック OFF→ON、または `sync:bedrock-world-pack` |
+| `!fc` だけ効かない | Beta APIs を ON（他の方法は Beta 不要） |
 
 ---
 
-## 6. manifest の API バージョン
+## 6. AI 向け同期ドキュメント
 
-`behavior_packs/floor_column_copy/manifest.json` の dependencies:
+- **[project-sync.md](./project-sync.md)** … ChatGPT / 他 AI 向けの仕様・構成の正
+- 仕様変更後は **`npm run sync:project-docs`** で自動セクション（メタ・ディレクトリ・ゲーム仕様）を更新
 
-- `@minecraft/server` **1.11.0**
-- `@minecraft/server-ui` **1.2.0**
+---
 
-ゲームが提供する API より新しい版を指定すると、スクリプトが読み込まれないことがある。
+## 7. 仕様上の制限
+
+- 1 回のコピーは最大 384 ブロック（ワールド下限で打ち切りあり）
+- BlockEntity データ（チェスト中身・看板文字など）はコピーされない
+- 別ディメンションへの貼り付けは警告を出して続行する

@@ -5,6 +5,10 @@
   "type": "module",
   "description": "Minecraft Bedrock 統合版アドオン「Floor Column Copy」",
   "scripts": {
+    "test": "node --test tests/project-sync-core.test.mjs",
+    "test:ci": "npm test && npm run sync:project-docs:check && npm run verify:bedrock-pack",
+    "sync:project-docs": "node scripts/sync-project-docs.mjs",
+    "sync:project-docs:check": "node scripts/sync-project-docs.mjs --check",
     "install:bedrock-pack": "node scripts/install-bedrock-pack.mjs",
     "verify:bedrock-pack": "node scripts/verify-bedrock-pack.mjs",
     "sync:bedrock-world-pack": "node scripts/sync-bedrock-world-pack.mjs",

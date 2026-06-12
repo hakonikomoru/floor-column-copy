@@ -14,36 +14,19 @@ Minecraft Bedrock Edition 向け Script API アドオンです。
 
 ## 必要環境
 
-- Minecraft Bedrock Edition **1.21 以降**
-- ワールドで **Beta APIs（実験的ゲームプレイ）** を有効化（Script API 利用のため）
+- Minecraft Bedrock Edition **1.21 以降**（**Minecraft Launcher / 統合版**）
+- ワールドで **ビヘイビアパック＋リソースパック** の両方を適用
+- **Beta APIs は不要**（`!fc` チャットを使う場合のみ ON）
 
-## インストール（Minecraft Launcher / 統合版）
+## インストール
 
-### 開発時（推奨）
+1. 次の 2 フォルダを Launcher の `com.mojang` に置く  
+   - `behavior_packs/floor_column_copy`  
+   - `resource_packs/floor_column_copy`
+2. ワールド設定で **Floor Column Copy** をビヘイビア・リソースの **両方** に追加
+3. ワールドに入る（初回スポーンで杖が自動配布）
 
-リポジトリを Launcher のパックフォルダへジャンクションで接続する（`return-of-boxworld` と同じ手順）:
-
-```bash
-npm run install:bedrock-pack
-```
-
-PowerShell で `npm` が拒否される場合:
-
-```bash
-npm.cmd run install:bedrock-pack
-# または
-node scripts/install-bedrock-pack.mjs
-```
-
-### ワールドへの適用
-
-1. **新規ワールド**を作成（実験的機能 **Beta APIs** を ON）
-2. ワールド設定 → **ビヘイビアパック** と **リソースパック** の両方で **Floor Column Copy** を有効化
-3. ワールドを開き、`!fc give` で動作確認
-
-詳細・トラブルシュートは **[docs/bedrock-dev-notes.md](docs/bedrock-dev-notes.md)** を参照。
-
-### 手動コピーする場合（Launcher）
+リポジトリから直接つなぐ場合: `npm run install:bedrock-pack`（詳細は [docs/bedrock-dev-notes.md](docs/bedrock-dev-notes.md)）
 
 ```
 %APPDATA%\Minecraft Bedrock\Users\Shared\games\com.mojang\
@@ -51,26 +34,13 @@ node scripts/install-bedrock-pack.mjs
   resource_packs\floor_column_copy\
 ```
 
-### 開発コマンド
-
-| コマンド | 内容 |
-| --- | --- |
-| `npm run install:bedrock-pack` | Launcher へジャンクション作成 |
-| `npm run verify:bedrock-pack` | 配置確認 |
-| `npm run sync:bedrock-world-pack` | 適用済みワールドへ同期 |
-| `npm run dev:bedrock` | 監視しながら自動同期 |
-
 ## 使い方
 
-### 1. 杖の入手（テスト用・推奨）
+### 1. 杖の入手
 
-チャットで:
-
-```
-!fc give
-```
-
-コピーの杖と貼り付けの杖がインベントリに入ります。
+- **初回ワールド参加時**に自動配布
+- **クリエイティブ** → 装備タブ → **Floor Column Copy**
+- `/fc:give` または `/function fc/give`（チート ON）
 
 ### 2. コピー
 
@@ -90,32 +60,44 @@ node scripts/install-bedrock-pack.mjs
 コピーしていない状態で貼り付けると  
 `コピーされたブロックがありません` と表示されます。
 
-## 補助コマンド（任意）
+## コマンド一覧
 
-| コマンド | 内容 |
+| 方法 | コマンド | 備考 |
+| --- | --- | --- |
+| 杖 | コピー/貼り付けの杖を使用 | **基本操作（Beta 不要）** |
+| スラッシュ | `/fc:give` `/fc:menu` `/fc:paste` | 1.21.80 以降 |
+| 関数 | `/function fc/give` など | チート ON |
+| scriptevent | `/scriptevent fc:give run` | チート ON |
+| チャット | `!fc give` など | **Beta APIs** が必要 |
+
+## ドキュメント（AI / ChatGPT 同期）
+
+| ファイル | 用途 |
 | --- | --- |
-| `!fc give` | 2 種類の杖を付与 |
-| `!fc menu` | コピー高さメニューを開く |
-| `!fc paste` | 即貼り付け |
-| `!fc` | ヘルプ表示 |
+| [docs/project-sync.md](docs/project-sync.md) | **ChatGPT / AI 向け**の仕様・構成の正 |
+| [docs/bedrock-dev-notes.md](docs/bedrock-dev-notes.md) | Launcher 導入・トラブルシュート |
 
-## クリエイティブインベントリ
-
-装備タブの **Floor Column Copy** グループに 2 種類の杖が表示されます。  
-表示されない場合は `!fc give` を使ってください。
+仕様を変えたら `npm run sync:project-docs` で `project-sync.md` の自動セクションを更新してください。
 
 ## ファイル構成
 
 ```txt
+AGENTS.md
 docs/
   bedrock-dev-notes.md
+  project-sync.md
+tests/
+  project-sync-core.test.mjs
 scripts/
+  project-sync-core.mjs
+  sync-project-docs.mjs
   install-bedrock-pack.mjs
   sync-bedrock-world-pack.mjs
   verify-bedrock-pack.mjs
   watch-bedrock-world-pack.mjs
 behavior_packs/floor_column_copy/
   manifest.json
+  functions/fc/
   items/
     copy_wand.json
     paste_wand.json

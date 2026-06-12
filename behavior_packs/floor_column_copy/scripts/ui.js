@@ -20,6 +20,10 @@ const COPY_MENU_ACTIONS = [
  * @param {import("@minecraft/server").Player} player
  */
 export async function showCopyHeightMenu(player) {
+  if (!player?.isValid) {
+    return;
+  }
+
   const maxHeight = getMaxCopyHeightForPlayer(player);
   const form = new ActionFormData()
     .title("Floor Column Copy")
@@ -43,14 +47,18 @@ export async function showCopyHeightMenu(player) {
 
   if (action.type === "preset") {
     system.run(() => {
-      copyColumn(player, action.height);
+      if (player.isValid) {
+        copyColumn(player, action.height);
+      }
     });
     return;
   }
 
   if (action.type === "max") {
     system.run(() => {
-      copyColumn(player, maxHeight);
+      if (player.isValid) {
+        copyColumn(player, maxHeight);
+      }
     });
     return;
   }
@@ -62,9 +70,14 @@ export async function showCopyHeightMenu(player) {
  * @param {import("@minecraft/server").Player} player
  */
 async function showCustomHeightForm(player) {
+  if (!player?.isValid) {
+    return;
+  }
+
+  const maxHeight = getMaxCopyHeightForPlayer(player);
   const form = new ModalFormData()
     .title("コピー高さの入力")
-    .textField("高さ（1〜384）", "例: 20", "1");
+    .textField(`高さ（1〜${maxHeight}）`, "例: 20", "1");
 
   const response = await form.show(player);
   if (response.canceled) {
@@ -74,13 +87,15 @@ async function showCustomHeightForm(player) {
   const rawValue = String(response.formValues?.[0] ?? "").trim();
   const height = Number.parseInt(rawValue, 10);
 
-  if (!Number.isInteger(height) || height < 1 || height > CONFIG.maxCopyHeight) {
-    player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.invalidHeight}`);
+  if (!Number.isInteger(height) || height < 1 || height > maxHeight) {
+    player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.invalidHeight(maxHeight)}`);
     return;
   }
 
   system.run(() => {
-    copyColumn(player, height);
+    if (player.isValid) {
+      copyColumn(player, height);
+    }
   });
 }
 
@@ -90,6 +105,9 @@ async function showCustomHeightForm(player) {
 export function openCopyMenu(player) {
   showCopyHeightMenu(player).catch((error) => {
     console.warn(`[FC] copy menu failed: ${error?.message ?? error}`);
+    if (player?.isValid) {
+      player.sendMessage(`${CONFIG.messages.prefix} メニューを開けませんでした`);
+    }
   });
 }
 

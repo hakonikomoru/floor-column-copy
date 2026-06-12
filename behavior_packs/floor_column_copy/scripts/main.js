@@ -3,12 +3,25 @@ import { CONFIG } from "./config.js";
 import { openCopyMenu } from "./ui.js";
 import { pasteColumn } from "./paste.js";
 
-console.warn("[FC] Floor Column Copy loaded");
+console.warn(`[FC] Floor Column Copy loaded (pack ${CONFIG.packVersion})`);
+
+/** @type {Map<string, number>} */
+const wandActionTick = new Map();
+
+let gameEventsRegistered = false;
+let startupRegistered = false;
+let addonReadyDone = false;
+/** @type {"before" | "after" | "none"} */
+let chatHandlerMode = "none";
 
 /**
  * @param {import("@minecraft/server").Player} player
  */
 export function giveWands(player) {
+  if (!player?.isValid) {
+    return;
+  }
+
   const inventory = player.getComponent("inventory")?.container;
   if (!inventory) {
     player.sendMessage(`${CONFIG.messages.prefix} インベントリを取得できません`);
@@ -27,82 +40,466 @@ export function giveWands(player) {
     }
   }
 
+  player.setDynamicProperty(CONFIG.dynamicProperties.starterGiven, true);
   player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.giveDone}`);
 }
 
-function registerItemUseHandlers() {
-  const itemUse = world.afterEvents?.itemUse;
-  if (!itemUse) {
-    console.warn("[FC] itemUse event is not available in this Script API version.");
+/**
+ * @param {import("@minecraft/server").Player} player
+ * @param {{ force?: boolean }} [options]
+ */
+function tryGiveStarterWands(player, options = {}) {
+  if (!player?.isValid) {
     return;
   }
 
-  itemUse.subscribe((event) => {
-    const player = event.source;
-    const item = event.itemStack;
-    if (!player || !item) {
-      return;
-    }
+  if (!options.force && player.getDynamicProperty(CONFIG.dynamicProperties.starterGiven)) {
+    return;
+  }
 
-    const typeId = item.typeId;
-
-    if (typeId === CONFIG.items.copyWand) {
-      system.run(() => {
-        openCopyMenu(player);
-      });
-      return;
-    }
-
-    if (typeId === CONFIG.items.pasteWand) {
-      system.run(() => {
-        pasteColumn(player);
-      });
-    }
-  });
-
-  console.warn("[FC] item use handlers registered.");
+  giveWands(player);
 }
 
-function registerChatCommands() {
-  const chatSend = world.beforeEvents?.chatSend;
-  if (!chatSend) {
-    console.warn("[FC] chatSend event is not available; !fc commands disabled.");
+/**
+ * @param {import("@minecraft/server").Player} player
+ */
+function showHelp(player) {
+  for (const line of CONFIG.messages.help) {
+    player.sendMessage(`${CONFIG.messages.prefix} ${line}`);
+  }
+}
+
+/**
+ * @param {import("@minecraft/server").Player} player
+ * @param {string} action
+ */
+function runFcAction(player, action) {
+  if (!player?.isValid) {
     return;
   }
 
-  chatSend.subscribe((event) => {
-    const message = event.message.trim();
-    if (!message.toLowerCase().startsWith("!fc")) {
+  switch (action) {
+    case "give":
+      giveWands(player);
+      return;
+    case "menu":
+    case "copy":
+      openCopyMenu(player);
+      return;
+    case "paste":
+      pasteColumn(player);
+      return;
+    case "help":
+    default:
+      showHelp(player);
+  }
+}
+
+/**
+ * @param {import("@minecraft/server").Player} player
+ * @returns {import("@minecraft/server").ItemStack | undefined}
+ */
+function getHeldItemStack(player) {
+  const inventory = player.getComponent("inventory");
+  const container = inventory?.container;
+  if (!container) {
+    return undefined;
+  }
+
+  let slot = 0;
+  if (inventory && typeof inventory.selectedSlot === "number") {
+    slot = inventory.selectedSlot;
+  } else if (typeof player.selectedSlotIndex === "number") {
+    slot = player.selectedSlotIndex;
+  }
+
+  return container.getItem(slot);
+}
+
+/**
+ * @param {string | undefined} typeId
+ */
+function isFcWand(typeId) {
+  return typeId === CONFIG.items.copyWand || typeId === CONFIG.items.pasteWand;
+}
+
+/**
+ * @param {import("@minecraft/server").Player} player
+ * @param {import("@minecraft/server").ItemStack | undefined} itemStack
+ */
+function handleWandUse(player, itemStack) {
+  if (!player?.isValid || !itemStack) {
+    return;
+  }
+
+  const tick = system.currentTick;
+  if (wandActionTick.get(player.id) === tick) {
+    return;
+  }
+  wandActionTick.set(player.id, tick);
+
+  if (itemStack.typeId === CONFIG.items.copyWand) {
+    openCopyMenu(player);
+    return;
+  }
+
+  if (itemStack.typeId === CONFIG.items.pasteWand) {
+    pasteColumn(player);
+  }
+}
+
+function registerItemUseHandlers() {
+  /**
+   * @param {{ source?: import("@minecraft/server").Player, itemStack?: import("@minecraft/server").ItemStack }} event
+   * @param {boolean} cancelVanilla
+   */
+  const onItemUse = (event, cancelVanilla) => {
+    const player = event.source;
+    const itemStack = event.itemStack;
+    if (!player || !itemStack || !isFcWand(itemStack.typeId)) {
       return;
     }
 
-    event.cancel = true;
-    const player = event.sender;
-    const args = message.slice(3).trim().split(/\s+/).filter(Boolean);
-    const subcommand = (args[0] ?? "help").toLowerCase();
+    if (cancelVanilla) {
+      event.cancel = true;
+    }
 
+    system.run(() => handleWandUse(player, itemStack));
+  };
+
+  const afterUse = world.afterEvents?.itemUse;
+  if (afterUse) {
+    afterUse.subscribe((event) => onItemUse(event, false));
+    console.warn("[FC] item handler: afterEvents.itemUse");
+    return;
+  }
+
+  const beforeUse = world.beforeEvents?.itemUse;
+  if (beforeUse) {
+    beforeUse.subscribe((event) => onItemUse(event, true));
+    console.warn("[FC] item handler: beforeEvents.itemUse");
+    return;
+  }
+
+  console.warn("[FC] itemUse events not available");
+}
+
+function registerWandBlockInteractHandlers() {
+  /**
+   * @param {{ player?: import("@minecraft/server").Player, itemStack?: import("@minecraft/server").ItemStack }} event
+   * @param {boolean} cancelVanilla
+   */
+  const onBlockInteract = (event, cancelVanilla) => {
+    const player = event.player;
+    if (!player) {
+      return;
+    }
+
+    const held = event.itemStack ?? getHeldItemStack(player);
+    if (!held || !isFcWand(held.typeId)) {
+      return;
+    }
+
+    if (cancelVanilla) {
+      event.cancel = true;
+    }
+
+    system.run(() => handleWandUse(player, held));
+  };
+
+  const before = world.beforeEvents?.playerInteractWithBlock;
+  if (before) {
+    before.subscribe((event) => onBlockInteract(event, true));
+    console.warn("[FC] wand handler: beforeEvents.playerInteractWithBlock");
+  }
+
+  const after = world.afterEvents?.playerInteractWithBlock;
+  if (after) {
+    after.subscribe((event) => onBlockInteract(event, false));
+    console.warn("[FC] wand handler: afterEvents.playerInteractWithBlock");
+  }
+}
+
+function registerChatHandlers() {
+  const beforeChat = world.beforeEvents?.chatSend;
+  if (beforeChat) {
+    beforeChat.subscribe((event) => {
+      const message = event.message.trim();
+      if (!message.toLowerCase().startsWith("!fc")) {
+        return;
+      }
+
+      event.cancel = true;
+      const player = event.sender;
+      const args = message.slice(3).trim().split(/\s+/).filter(Boolean);
+      const subcommand = (args[0] ?? "help").toLowerCase();
+
+      system.run(() => runFcAction(player, subcommand));
+    });
+    chatHandlerMode = "before";
+    console.warn("[FC] chat handler: beforeEvents.chatSend");
+    return;
+  }
+
+  const afterChat = world.afterEvents?.chatSend;
+  if (afterChat) {
+    afterChat.subscribe((event) => {
+      const message = event.message.trim();
+      if (!message.toLowerCase().startsWith("!fc")) {
+        return;
+      }
+
+      const player = event.sender;
+      const args = message.slice(3).trim().split(/\s+/).filter(Boolean);
+      const subcommand = (args[0] ?? "help").toLowerCase();
+
+      system.run(() => runFcAction(player, subcommand));
+    });
+    chatHandlerMode = "after";
+    console.warn("[FC] chat handler: afterEvents.chatSend");
+    return;
+  }
+
+  chatHandlerMode = "none";
+  console.warn("[FC] chat handlers unavailable — use wand, /function fc/*, or /fc:*");
+}
+
+/**
+ * @param {string} eventId
+ * @param {import("@minecraft/server").Entity | undefined} sourceEntity
+ */
+function handleScriptEvent(eventId, sourceEntity) {
+  const id = eventId.toLowerCase();
+  const player =
+    sourceEntity && typeof sourceEntity.sendMessage === "function" ? sourceEntity : undefined;
+
+  if (!player) {
+    return;
+  }
+
+  if (id.includes("give")) {
+    runFcAction(player, "give");
+    return;
+  }
+  if (id.includes("menu") || id.includes("copy")) {
+    runFcAction(player, "menu");
+    return;
+  }
+  if (id.includes("paste")) {
+    runFcAction(player, "paste");
+    return;
+  }
+
+  runFcAction(player, "help");
+}
+
+function registerScriptEventHandlers() {
+  const scriptEventSignal =
+    system.afterEvents?.scriptEventReceive ?? world.afterEvents?.scriptEventReceive;
+  if (!scriptEventSignal) {
+    console.warn("[FC] scriptEventReceive not available");
+    return;
+  }
+
+  scriptEventSignal.subscribe((event) => {
     system.run(() => {
-      if (subcommand === "give") {
-        giveWands(player);
-        return;
-      }
-
-      if (subcommand === "menu" || subcommand === "copy") {
-        openCopyMenu(player);
-        return;
-      }
-
-      if (subcommand === "paste") {
-        pasteColumn(player);
-        return;
-      }
-
-      player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.help}`);
+      handleScriptEvent(event.id, event.sourceEntity);
     });
   });
-
-  console.warn("[FC] chat commands registered (!fc give / menu / paste).");
+  console.warn("[FC] registered /scriptevent fc:* handler");
 }
 
-registerItemUseHandlers();
-registerChatCommands();
+/**
+ * @param {import("@minecraft/server").StartupEvent} initEvent
+ */
+function registerFcCustomCommands(initEvent) {
+  const registry = initEvent?.customCommandRegistry;
+  if (!registry?.registerCommand) {
+    console.warn("[FC] customCommandRegistry unavailable — use /function fc/* or /scriptevent fc:*");
+    return;
+  }
+
+  const specs = [
+    ["fc:give", "杖を配布", "give"],
+    ["fc:menu", "コピーメニュー", "menu"],
+    ["fc:copy", "コピーメニュー", "menu"],
+    ["fc:paste", "貼り付け", "paste"],
+    ["fc:help", "ヘルプ", "help"],
+  ];
+
+  for (const [name, description, action] of specs) {
+    registry.registerCommand(
+      {
+        name,
+        description: `FC: ${description}`,
+        permissionLevel: 0,
+        cheatsRequired: false,
+      },
+      (origin) => {
+        const entity = origin?.sourceEntity;
+        system.run(() => {
+          if (entity) {
+            runFcAction(entity, action);
+          }
+        });
+        return { status: 0 };
+      },
+    );
+  }
+
+  console.warn("[FC] registered slash commands: /fc:give, /fc:menu, /fc:paste");
+}
+
+function registerStartupHandlers() {
+  if (startupRegistered) {
+    return;
+  }
+
+  const startup = system.beforeEvents?.startup;
+  if (!startup) {
+    console.warn("[FC] startup event unavailable");
+    return;
+  }
+
+  startupRegistered = true;
+  startup.subscribe((initEvent) => {
+    registerFcCustomCommands(initEvent);
+
+    const itemRegistry = initEvent?.itemComponentRegistry;
+    if (!itemRegistry?.registerCustomComponent) {
+      console.warn("[FC] itemComponentRegistry unavailable");
+      return;
+    }
+
+    itemRegistry.registerCustomComponent("floor_column_copy:copy_action", {
+      onUse(event) {
+        const player = event.source;
+        if (!player?.isValid) {
+          return;
+        }
+        system.run(() => handleWandUse(player, event.itemStack));
+      },
+    });
+
+    itemRegistry.registerCustomComponent("floor_column_copy:paste_action", {
+      onUse(event) {
+        const player = event.source;
+        if (!player?.isValid) {
+          return;
+        }
+        system.run(() => handleWandUse(player, event.itemStack));
+      },
+    });
+
+    console.warn("[FC] registered item components: copy_action, paste_action");
+  });
+}
+
+function registerGameEvents() {
+  if (gameEventsRegistered) {
+    return;
+  }
+
+  registerItemUseHandlers();
+  registerWandBlockInteractHandlers();
+  registerChatHandlers();
+  registerScriptEventHandlers();
+  gameEventsRegistered = true;
+  console.warn("[FC] game events registered");
+}
+
+function getReadyLines() {
+  const lines = [`${CONFIG.messages.ready}`];
+  lines.push("コピーの杖を使用 → 高さ選択 / 貼り付けの杖を使用 → 即貼り付け");
+  lines.push("/function fc/give または /fc:give で杖を入手");
+  if (chatHandlerMode === "none") {
+    lines.push("(!fc は Beta APIs が必要です)");
+  }
+  return lines;
+}
+
+function announceReady() {
+  for (const player of world.getPlayers()) {
+    try {
+      for (const line of getReadyLines()) {
+        player.sendMessage(`${CONFIG.messages.prefix} ${line}`);
+      }
+    } catch (error) {
+      console.warn(`[FC] ready message failed: ${error?.message ?? error}`);
+    }
+  }
+}
+
+function onAddonReady() {
+  if (!addonReadyDone) {
+    try {
+      registerGameEvents();
+      addonReadyDone = true;
+      console.warn(`[FC] addon active (pack ${CONFIG.packVersion})`);
+      announceReady();
+    } catch (error) {
+      console.warn(`[FC] startup failed: ${error?.message ?? error}`);
+      try {
+        registerGameEvents();
+      } catch (registerError) {
+        console.warn(`[FC] registerGameEvents retry failed: ${registerError?.message ?? registerError}`);
+      }
+    }
+  }
+
+  for (const player of world.getPlayers()) {
+    tryGiveStarterWands(player);
+  }
+}
+
+function scheduleAddonReady() {
+  system.run(() => onAddonReady());
+}
+
+function bootstrapFcScript() {
+  console.warn(`[FC] bootstrap (pack ${CONFIG.packVersion})`);
+  try {
+    registerStartupHandlers();
+  } catch (error) {
+    console.warn(`[FC] bootstrap startup: ${error?.message ?? error}`);
+  }
+
+  try {
+    registerGameEvents();
+  } catch (error) {
+    console.warn(`[FC] bootstrap registerGameEvents: ${error?.message ?? error}`);
+  }
+
+  scheduleAddonReady();
+  system.runTimeout(scheduleAddonReady, 40);
+  system.runTimeout(scheduleAddonReady, 100);
+}
+
+bootstrapFcScript();
+
+if (world.afterEvents?.worldLoad) {
+  world.afterEvents.worldLoad.subscribe(() => scheduleAddonReady());
+}
+
+world.afterEvents.playerSpawn.subscribe((event) => {
+  scheduleAddonReady();
+
+  if (!event.initialSpawn) {
+    return;
+  }
+
+  system.run(() => {
+    const player = event.player;
+    if (!player?.isValid) {
+      return;
+    }
+
+    for (const line of getReadyLines()) {
+      player.sendMessage(`${CONFIG.messages.prefix} ${line}`);
+    }
+
+    tryGiveStarterWands(player);
+    system.runTimeout(() => tryGiveStarterWands(player), 40);
+    system.runTimeout(() => tryGiveStarterWands(player), 100);
+  });
+});

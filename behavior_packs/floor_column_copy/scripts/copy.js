@@ -59,7 +59,7 @@ export function clampCopyHeight(player, requestedHeight) {
 export function copyColumn(player, height) {
   const safeHeight = clampCopyHeight(player, height);
   if (safeHeight <= 0) {
-    player.sendMessage(`${CONFIG.messages.prefix} コピーできるブロックがありません`);
+    player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.noBlocksToCopy}`);
     return 0;
   }
 
@@ -82,19 +82,21 @@ export function copyColumn(player, height) {
       }
       permutations.push(block.permutation);
     } catch (error) {
-      console.warn(
-        `[FC] copy skipped at y=${y}: ${error?.message ?? error}`,
-      );
+      console.warn(`[FC] copy skipped at y=${y}: ${error?.message ?? error}`);
       break;
     }
   }
 
   if (permutations.length === 0) {
-    player.sendMessage(`${CONFIG.messages.prefix} コピーできるブロックがありません`);
+    player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.noBlocksToCopy}`);
     return 0;
   }
 
-  setClipboard(player.id, permutations);
-  player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.copyDone(permutations.length)}`);
+  setClipboard(player.id, permutations, dimension.id);
+  const message =
+    safeHeight > permutations.length
+      ? CONFIG.messages.copyPartial(permutations.length, safeHeight)
+      : CONFIG.messages.copyDone(permutations.length);
+  player.sendMessage(`${CONFIG.messages.prefix} ${message}`);
   return permutations.length;
 }

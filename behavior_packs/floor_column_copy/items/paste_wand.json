@@ -26,7 +26,8 @@
       },
       "minecraft:display_name": {
         "value": "item.floor_column_copy:paste_wand.name"
-      }
+      },
+      "floor_column_copy:paste_action": {}
     }
   }
 }
