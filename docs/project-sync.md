@@ -4,7 +4,7 @@
 > 人間向けの概要は [README.md](../README.md)、Launcher 手順は [bedrock-dev-notes.md](./bedrock-dev-notes.md)。
 
 <!-- sync:auto:meta:start -->
-最終更新の想定リポジトリ: `hakonikomoru/floor-column-copy`（`main`・`f3f373b`・2026-06-12・`npm run sync:project-docs` 自動反映）
+最終更新の想定リポジトリ: `hakonikomoru/floor-column-copy`（`main`・`57e0611`・2026-06-12・`npm run sync:project-docs` 自動反映）
 <!-- sync:auto:meta:end -->
 
 ---
@@ -29,6 +29,7 @@
 | ファイル | 読者 | 用途 |
 | --- | --- | --- |
 | [README.md](../README.md) | 開発者・プレイヤー | 導入・使い方・コマンド早見 |
+| [addon-description.md](./addon-description.md) | 配布・紹介 | 説明画像・短文コピペ用 |
 | [bedrock-dev-notes.md](./bedrock-dev-notes.md) | 開発者 | Launcher パス・トラブルシュート |
 | **project-sync.md**（本ファイル） | AI / ChatGPT | 構成・仕様・実装の正 |
 
@@ -72,7 +73,11 @@ floor-column-copy/
 │           ├── items/
 │           └── ui/
 ├── docs/
+│   ├── addon-description.md
 │   ├── bedrock-dev-notes.md
+│   ├── images/
+│   │   ├── description_en.png
+│   │   └── description_ja.png
 │   └── project-sync.md
 ├── scripts/
 │   ├── install-bedrock-pack.mjs
@@ -82,6 +87,8 @@ floor-column-copy/
 │   ├── sync-project-docs.mjs
 │   ├── verify-bedrock-pack.mjs
 │   └── watch-bedrock-world-pack.mjs
+├── tests/
+│   └── project-sync-core.test.mjs
 ```
 <!-- sync:auto:directory-tree:end -->
 
@@ -186,6 +193,15 @@ floor-column-copy/
 | `pack_icon.png` | `behavior_packs/floor_column_copy/` と `resource_packs/floor_column_copy/` のルート |
 
 ワールド設定のパック一覧に表示される。変更時は manifest `version` を上げて OFF→ON。
+
+### 説明画像（配布・README 用）
+
+| ファイル | 言語 |
+| --- | --- |
+| `docs/images/description_ja.png` | 日本語 |
+| `docs/images/description_en.png` | English |
+
+[addon-description.md](./addon-description.md) と [README.md](../README.md) から参照。
 
 ### アイテムテクスチャ（16×16）
 

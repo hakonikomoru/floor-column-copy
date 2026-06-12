@@ -5,6 +5,11 @@ Minecraft Bedrock Edition 向け Script API アドオンです。
 
 **Repository:** [github.com/hakonikomoru/floor-column-copy](https://github.com/hakonikomoru/floor-column-copy)
 
+![Floor Column Copy 説明画像（日本語）](docs/images/description_ja.png)
+
+説明画像（英語）: [docs/images/description_en.png](docs/images/description_en.png)  
+配布・紹介文: [docs/addon-description.md](docs/addon-description.md)
+
 ## 機能
 
 - **コピーの杖** (`floor_column_copy:copy_wand`) … 右クリックで高さ選択メニュー
@@ -75,6 +80,7 @@ Minecraft Bedrock Edition 向け Script API アドオンです。
 | ファイル | 用途 |
 | --- | --- |
 | [docs/project-sync.md](docs/project-sync.md) | **ChatGPT / AI 向け**の仕様・構成の正 |
+| [docs/addon-description.md](docs/addon-description.md) | 配布・紹介用（説明画像・短文） |
 | [docs/bedrock-dev-notes.md](docs/bedrock-dev-notes.md) | Launcher 導入・トラブルシュート |
 
 仕様を変えたら `npm run sync:project-docs` で `project-sync.md` の自動セクションを更新してください。
@@ -84,7 +90,11 @@ Minecraft Bedrock Edition 向け Script API アドオンです。
 ```txt
 AGENTS.md
 docs/
+  addon-description.md
   bedrock-dev-notes.md
+  images/
+    description_ja.png
+    description_en.png
   project-sync.md
 tests/
   project-sync-core.test.mjs
