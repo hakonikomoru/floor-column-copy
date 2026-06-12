@@ -1,0 +1,14 @@
+{
+  "name": "floor-column-copy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Minecraft Bedrock 統合版アドオン「Floor Column Copy」",
+  "scripts": {
+    "install:bedrock-pack": "node scripts/install-bedrock-pack.mjs",
+    "verify:bedrock-pack": "node scripts/verify-bedrock-pack.mjs",
+    "sync:bedrock-world-pack": "node scripts/sync-bedrock-world-pack.mjs",
+    "watch:bedrock-world-pack": "node scripts/watch-bedrock-world-pack.mjs",
+    "dev:bedrock": "node scripts/watch-bedrock-world-pack.mjs"
+  }
+}

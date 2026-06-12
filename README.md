@@ -3,6 +3,8 @@
 Minecraft Bedrock Edition 向け Script API アドオンです。  
 プレイヤーが立っている足元ブロックから、**下方向（Y 軸のみ）** にブロック列をコピーし、別の地点へ貼り付けできます。
 
+**Repository:** [github.com/hakonikomoru/floor-column-copy](https://github.com/hakonikomoru/floor-column-copy)
+
 ## 機能
 
 - **コピーの杖** (`floor_column_copy:copy_wand`) … 右クリックで高さ選択メニュー
@@ -15,21 +17,48 @@ Minecraft Bedrock Edition 向け Script API アドオンです。
 - Minecraft Bedrock Edition **1.21 以降**
 - ワールドで **Beta APIs（実験的ゲームプレイ）** を有効化（Script API 利用のため）
 
-## インストール
+## インストール（Minecraft Launcher / 統合版）
 
-1. このリポジトリの以下 2 パックを、Minecraft の開発者フォルダへコピーします。
-   - `behavior_packs/floor_column_copy`
-   - `resource_packs/floor_column_copy`
-2. ワールド設定 → ビヘイビアパック / リソースパック から **Floor Column Copy** を有効化
-3. ワールドを開き、動作確認
+### 開発時（推奨）
 
-### 開発者フォルダ（Windows 例）
+リポジトリを Launcher のパックフォルダへジャンクションで接続する（`return-of-boxworld` と同じ手順）:
+
+```bash
+npm run install:bedrock-pack
+```
+
+PowerShell で `npm` が拒否される場合:
+
+```bash
+npm.cmd run install:bedrock-pack
+# または
+node scripts/install-bedrock-pack.mjs
+```
+
+### ワールドへの適用
+
+1. **新規ワールド**を作成（実験的機能 **Beta APIs** を ON）
+2. ワールド設定 → **ビヘイビアパック** と **リソースパック** の両方で **Floor Column Copy** を有効化
+3. ワールドを開き、`!fc give` で動作確認
+
+詳細・トラブルシュートは **[docs/bedrock-dev-notes.md](docs/bedrock-dev-notes.md)** を参照。
+
+### 手動コピーする場合（Launcher）
 
 ```
-%LOCALAPPDATA%\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\LocalState\games\com.mojang\
-  behavior_packs\
-  resource_packs\
+%APPDATA%\Minecraft Bedrock\Users\Shared\games\com.mojang\
+  behavior_packs\floor_column_copy\
+  resource_packs\floor_column_copy\
 ```
+
+### 開発コマンド
+
+| コマンド | 内容 |
+| --- | --- |
+| `npm run install:bedrock-pack` | Launcher へジャンクション作成 |
+| `npm run verify:bedrock-pack` | 配置確認 |
+| `npm run sync:bedrock-world-pack` | 適用済みワールドへ同期 |
+| `npm run dev:bedrock` | 監視しながら自動同期 |
 
 ## 使い方
 
@@ -78,6 +107,13 @@ Minecraft Bedrock Edition 向け Script API アドオンです。
 ## ファイル構成
 
 ```txt
+docs/
+  bedrock-dev-notes.md
+scripts/
+  install-bedrock-pack.mjs
+  sync-bedrock-world-pack.mjs
+  verify-bedrock-pack.mjs
+  watch-bedrock-world-pack.mjs
 behavior_packs/floor_column_copy/
   manifest.json
   items/
