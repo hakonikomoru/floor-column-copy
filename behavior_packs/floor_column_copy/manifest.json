@@ -4,7 +4,7 @@
     "name": "Floor Column Copy",
     "description": "Copy and paste vertical floor columns with dedicated wands.",
     "uuid": "f1a2b3c4-d5e6-4f78-9a0b-1c2d3e4f5a6b",
-    "version": [1, 0, 3],
+    "version": [1, 0, 4],
     "min_engine_version": [1, 21, 0]
   },
   "metadata": {
@@ -14,20 +14,20 @@
     {
       "type": "data",
       "uuid": "f2a3b4c5-d6e7-4f89-0a1b-2c3d4e5f6a7b",
-      "version": [1, 0, 3]
+      "version": [1, 0, 4]
     },
     {
       "type": "script",
       "language": "javascript",
       "uuid": "f3a4b5c6-d7e8-4f90-1a2b-3c4d5e6f7a8b",
       "entry": "scripts/main.js",
-      "version": [1, 0, 3]
+      "version": [1, 0, 4]
     }
   ],
   "dependencies": [
     {
       "uuid": "f4a5b6c7-d8e9-4fa1-2b3c-4d5e6f7a8b9c",
-      "version": [1, 0, 3]
+      "version": [1, 0, 4]
     },
     {
       "module_name": "@minecraft/server",

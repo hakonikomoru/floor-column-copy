@@ -6,5 +6,6 @@
   "treeEntries": ["behavior_packs", "resource_packs", "docs", "scripts", "tests"],
   "gameRulesConfigJs": "behavior_packs/floor_column_copy/scripts/config.js",
   "gameRulesUiJs": "behavior_packs/floor_column_copy/scripts/ui.js",
+  "gameRulesI18nJs": "behavior_packs/floor_column_copy/scripts/i18n.js",
   "gameRulesFunctionsDir": "behavior_packs/floor_column_copy/functions/fc"
 }

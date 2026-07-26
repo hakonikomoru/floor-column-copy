@@ -4,7 +4,7 @@
 > 人間向けの概要は [README.md](../README.md)、Launcher 手順は [bedrock-dev-notes.md](./bedrock-dev-notes.md)。
 
 <!-- sync:auto:meta:start -->
-最終更新の想定リポジトリ: `hakonikomoru/floor-column-copy`（`main`・`f4d0626`・2026-06-12・`npm run sync:project-docs` 自動反映）
+最終更新の想定リポジトリ: `hakonikomoru/floor-column-copy`（`main`・`e9f7057`・2026-07-26・`npm run sync:project-docs` 自動反映）
 <!-- sync:auto:meta:end -->
 
 ---
@@ -56,6 +56,7 @@ floor-column-copy/
 │       └── scripts/
 │           ├── config.js
 │           ├── copy.js
+│           ├── i18n.js
 │           ├── main.js
 │           ├── paste.js
 │           ├── storage.js
@@ -97,7 +98,7 @@ floor-column-copy/
 ## 3. ゲーム仕様（自動同期）
 
 <!-- sync:auto:game-rules:start -->
-> behavior_packs/floor_column_copy/scripts/config.js と ui.js から自動生成。仕様変更後は npm run sync:project-docs を実行。
+> behavior_packs/floor_column_copy/scripts/config.js・ui.js・i18n.js から自動生成。仕様変更後は npm run sync:project-docs を実行。
 
 ### アイテム
 
@@ -144,7 +145,7 @@ floor-column-copy/
 - 初回スポーン時にコピーの杖・貼り付けの杖を自動配布（`fc:starter_given` で再配布を抑制）
 - クリエイティブアイテムタブ **Floor Column Copy** からも取得可
 
-### ヘルプ文言（CONFIG.messages.help）
+### ヘルプ文言（i18n.js / ja）
 
 - 使い方: コピーの杖で高さを選び、貼り付けの杖で即貼り付け
 - 杖の入手: クリエイティブアイテムタブ / /function fc/give / /fc:give
@@ -152,7 +153,7 @@ floor-column-copy/
 
 ### パックバージョン
 
-- script 表示: `1.0.3`
+- script 表示: `1.0.4`
 <!-- sync:auto:game-rules:end -->
 
 ---
@@ -202,6 +203,13 @@ floor-column-copy/
 | `docs/images/description_en.png` | English |
 
 [addon-description.md](./addon-description.md) と [README.md](../README.md) から参照。
+
+### 言語（i18n）
+
+| 対象 | 仕組み |
+| --- | --- |
+| チャット・メニュー文言 | `scripts/i18n.js`（`player.locale` が `ja*` なら日本語、それ以外は英語） |
+| アイテム表示名 | `resource_packs/.../texts/en_US.lang` / `ja_JP.lang` |
 
 ### アイテムテクスチャ（16×16）
 

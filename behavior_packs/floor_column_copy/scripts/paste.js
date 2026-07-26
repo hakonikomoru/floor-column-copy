@@ -1,4 +1,4 @@
-import { CONFIG } from "./config.js";
+import { getMessages, sendFc } from "./i18n.js";
 import { getClipboard } from "./storage.js";
 import { getFootBlockLocation, getWorldMinY } from "./copy.js";
 
@@ -9,13 +9,13 @@ import { getFootBlockLocation, getWorldMinY } from "./copy.js";
 export function pasteColumn(player) {
   const clipboard = getClipboard(player.id);
   if (!clipboard || clipboard.permutations.length === 0) {
-    player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.noClipboard}`);
+    sendFc(player, getMessages(player).noClipboard);
     return 0;
   }
 
   const dimension = player.dimension;
   if (clipboard.dimensionId !== dimension.id) {
-    player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.dimensionMismatch}`);
+    sendFc(player, getMessages(player).dimensionMismatch);
   }
 
   const { x, y: startY, z } = getFootBlockLocation(player);
@@ -42,10 +42,11 @@ export function pasteColumn(player) {
   }
 
   const total = clipboard.permutations.length;
+  const messages = getMessages(player);
   const message =
     pasted < total
-      ? CONFIG.messages.pastePartial(pasted, total)
-      : CONFIG.messages.pasteDone(pasted);
-  player.sendMessage(`${CONFIG.messages.prefix} ${message}`);
+      ? messages.pastePartial(pasted, total)
+      : messages.pasteDone(pasted);
+  sendFc(player, message);
   return pasted;
 }

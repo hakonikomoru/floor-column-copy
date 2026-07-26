@@ -43,6 +43,7 @@ A Bedrock Edition building utility that copies a vertical column of blocks **dow
 
 - **対応環境:** Minecraft 統合版（Bedrock）1.21 以降
 - **操作:** コピーの杖 / 貼り付けの杖（Beta APIs 不要）
+- **言語:** ゲーム言語が日本語なら日本語、それ以外は英語
 - **補助:** `/fc:give` `/function fc/give` クリエイティブアイテムタブ
 
 制作: **komolab - こもらぼ -**
@@ -55,6 +56,7 @@ Select a height with the Copy Wand, then restore the column instantly with the P
 
 - **Platform:** Minecraft Bedrock Edition 1.21+
 - **Controls:** Copy Wand / Paste Wand (no Beta APIs required)
+- **Language:** Japanese when the game language is Japanese; English otherwise
 - **Extras:** `/fc:give`, `/function fc/give`, Creative inventory
 
 By **komolab - Komorabo -**

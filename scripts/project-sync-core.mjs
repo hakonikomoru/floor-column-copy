@@ -108,7 +108,15 @@ function parseConfigItemIds(block) {
   return items;
 }
 
-function parseHelpLines(block) {
+function parseHelpLines(i18nSource, locale = "ja") {
+  const localeMatch = i18nSource.match(
+    new RegExp(`${locale}:\\s*\\{([\\s\\S]*?)\\n\\s*\\},\\s*\\n\\s*(?:ja|en):`),
+  );
+  // Fallback: match ja/en block until next top-level key closing of MESSAGES
+  const block =
+    localeMatch?.[1] ??
+    i18nSource.match(new RegExp(`${locale}:\\s*\\{([\\s\\S]*?)\\n\\s*\\},?\\s*\\n\\};`))?.[1];
+  if (!block) return [];
   const helpMatch = block.match(/help:\s*\[([\s\S]*?)\]/);
   if (!helpMatch) return [];
   const lines = [];
@@ -120,7 +128,7 @@ function parseHelpLines(block) {
   return lines;
 }
 
-export function parseFcConfig(configSource) {
+export function parseFcConfig(configSource, i18nSource = "") {
   const configMatch = configSource.match(/export const CONFIG = \{([\s\S]*?)\n\};/);
   if (!configMatch) {
     throw new Error("export const CONFIG = { ... } が config.js に見つかりません");
@@ -132,14 +140,14 @@ export function parseFcConfig(configSource) {
     maxCopyHeight: parseConfigNumber(block, "maxCopyHeight"),
     defaultMinY: parseConfigNumber(block, "defaultMinY"),
     items: parseConfigItemIds(block),
-    prefix: parseConfigString(block, "prefix") ?? "[FC]",
-    helpLines: parseHelpLines(block),
+    prefix: "[FC]",
+    helpLines: i18nSource ? parseHelpLines(i18nSource, "ja") : [],
   };
 }
 
 export function parseFcMenuActions(uiSource) {
   const actions = [];
-  const labelRe = /label:\s*"([^"]+)"/g;
+  const labelRe = /labelJa:\s*"([^"]+)"/g;
   const typeRe = /type:\s*"([^"]+)"/g;
   const heightRe = /height:\s*(\d+)/g;
   const labels = [...uiSource.matchAll(labelRe)].map((m) => m[1]);
@@ -179,7 +187,7 @@ export function generateFcGameRulesMarkdown(spec, menuActions, mcFunctions = [])
   const helpLines = spec.helpLines.map((line) => `- ${line}`).join("\n");
 
   const lines = [
-    "> behavior_packs/floor_column_copy/scripts/config.js と ui.js から自動生成。仕様変更後は npm run sync:project-docs を実行。",
+    "> behavior_packs/floor_column_copy/scripts/config.js・ui.js・i18n.js から自動生成。仕様変更後は npm run sync:project-docs を実行。",
     "",
     "### アイテム",
     "",
@@ -218,7 +226,7 @@ export function generateFcGameRulesMarkdown(spec, menuActions, mcFunctions = [])
     "- 初回スポーン時にコピーの杖・貼り付けの杖を自動配布（`fc:starter_given` で再配布を抑制）",
     "- クリエイティブアイテムタブ **Floor Column Copy** からも取得可",
     "",
-    "### ヘルプ文言（CONFIG.messages.help）",
+    "### ヘルプ文言（i18n.js / ja）",
     "",
     helpLines || "- （未設定）",
     "",
@@ -255,7 +263,12 @@ export function runSync(config, options = {}) {
   if (markers.includes("game-rules") && config.gameRulesConfigJs) {
     const configPath = join(root, config.gameRulesConfigJs);
     const configSource = readFileSync(configPath, "utf8");
-    const spec = parseFcConfig(configSource);
+    const i18nPath = join(
+      root,
+      config.gameRulesI18nJs ?? "behavior_packs/floor_column_copy/scripts/i18n.js",
+    );
+    const i18nSource = existsSync(i18nPath) ? readFileSync(i18nPath, "utf8") : "";
+    const spec = parseFcConfig(configSource, i18nSource);
     let menuActions = [];
     if (config.gameRulesUiJs) {
       const uiPath = join(root, config.gameRulesUiJs);

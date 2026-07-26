@@ -1,4 +1,5 @@
 import { CONFIG } from "./config.js";
+import { getMessages, sendFc } from "./i18n.js";
 import { setClipboard } from "./storage.js";
 
 /**
@@ -59,7 +60,7 @@ export function clampCopyHeight(player, requestedHeight) {
 export function copyColumn(player, height) {
   const safeHeight = clampCopyHeight(player, height);
   if (safeHeight <= 0) {
-    player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.noBlocksToCopy}`);
+    sendFc(player, getMessages(player).noBlocksToCopy);
     return 0;
   }
 
@@ -88,15 +89,16 @@ export function copyColumn(player, height) {
   }
 
   if (permutations.length === 0) {
-    player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.noBlocksToCopy}`);
+    sendFc(player, getMessages(player).noBlocksToCopy);
     return 0;
   }
 
   setClipboard(player.id, permutations, dimension.id);
+  const messages = getMessages(player);
   const message =
     safeHeight > permutations.length
-      ? CONFIG.messages.copyPartial(permutations.length, safeHeight)
-      : CONFIG.messages.copyDone(permutations.length);
-  player.sendMessage(`${CONFIG.messages.prefix} ${message}`);
+      ? messages.copyPartial(permutations.length, safeHeight)
+      : messages.copyDone(permutations.length);
+  sendFc(player, message);
   return permutations.length;
 }

@@ -34,7 +34,11 @@ describe("parseFcConfig", () => {
       join(root, "behavior_packs", "floor_column_copy", "scripts", "config.js"),
       "utf8",
     );
-    const spec = parseFcConfig(source);
+    const i18n = readFileSync(
+      join(root, "behavior_packs", "floor_column_copy", "scripts", "i18n.js"),
+      "utf8",
+    );
+    const spec = parseFcConfig(source, i18n);
     assert.equal(spec.maxCopyHeight, 384);
     assert.equal(spec.items.copyWand, "floor_column_copy:copy_wand");
     assert.ok(spec.helpLines.length >= 1);

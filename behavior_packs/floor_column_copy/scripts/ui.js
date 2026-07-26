@@ -1,20 +1,29 @@
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { system } from "@minecraft/server";
-import { CONFIG } from "./config.js";
 import { copyColumn, getMaxCopyHeightForPlayer } from "./copy.js";
+import { getMessages, resolveLocale, sendFc } from "./i18n.js";
 
 const PRESET_HEIGHTS = [1, 3, 5, 10];
 
 const MENU_ICON_BASE = "textures/ui/menu";
 
+/** Shared menu action definitions (labels resolved per player locale). */
 const COPY_MENU_ACTIONS = [
-  { label: "1ブロック", type: "preset", height: 1, icon: `${MENU_ICON_BASE}/height_1` },
-  { label: "3ブロック", type: "preset", height: 3, icon: `${MENU_ICON_BASE}/height_3` },
-  { label: "5ブロック", type: "preset", height: 5, icon: `${MENU_ICON_BASE}/height_5` },
-  { label: "10ブロック", type: "preset", height: 10, icon: `${MENU_ICON_BASE}/height_10` },
-  { label: "数値入力", type: "custom", icon: `${MENU_ICON_BASE}/custom_input` },
-  { label: "最大", type: "max", icon: `${MENU_ICON_BASE}/max_height` },
+  { labelJa: "1ブロック", labelEn: "1 block", type: "preset", height: 1, icon: `${MENU_ICON_BASE}/height_1` },
+  { labelJa: "3ブロック", labelEn: "3 blocks", type: "preset", height: 3, icon: `${MENU_ICON_BASE}/height_3` },
+  { labelJa: "5ブロック", labelEn: "5 blocks", type: "preset", height: 5, icon: `${MENU_ICON_BASE}/height_5` },
+  { labelJa: "10ブロック", labelEn: "10 blocks", type: "preset", height: 10, icon: `${MENU_ICON_BASE}/height_10` },
+  { labelJa: "数値入力", labelEn: "Custom height", type: "custom", icon: `${MENU_ICON_BASE}/custom_input` },
+  { labelJa: "最大", labelEn: "Maximum", type: "max", icon: `${MENU_ICON_BASE}/max_height` },
 ];
+
+/**
+ * @param {import("@minecraft/server").Player} player
+ * @param {(typeof COPY_MENU_ACTIONS)[number]} action
+ */
+function actionLabel(player, action) {
+  return resolveLocale(player) === "ja" ? action.labelJa : action.labelEn;
+}
 
 /**
  * @param {import("@minecraft/server").Player} player
@@ -24,15 +33,14 @@ export async function showCopyHeightMenu(player) {
     return;
   }
 
+  const messages = getMessages(player);
   const maxHeight = getMaxCopyHeightForPlayer(player);
   const form = new ActionFormData()
-    .title("Floor Column Copy")
-    .body(
-      `足元ブロックから下方向にコピーする高さを選んでください。\n最大: ${maxHeight} ブロック`,
-    );
+    .title(messages.menuTitle)
+    .body(messages.menuBody(maxHeight));
 
   for (const action of COPY_MENU_ACTIONS) {
-    form.button(action.label, action.icon);
+    form.button(actionLabel(player, action), action.icon);
   }
 
   const response = await form.show(player);
@@ -74,10 +82,11 @@ async function showCustomHeightForm(player) {
     return;
   }
 
+  const messages = getMessages(player);
   const maxHeight = getMaxCopyHeightForPlayer(player);
   const form = new ModalFormData()
-    .title("コピー高さの入力")
-    .textField(`高さ（1〜${maxHeight}）`, "例: 20", "1");
+    .title(messages.customTitle)
+    .textField(messages.customField(maxHeight), messages.customPlaceholder, "1");
 
   const response = await form.show(player);
   if (response.canceled) {
@@ -88,7 +97,7 @@ async function showCustomHeightForm(player) {
   const height = Number.parseInt(rawValue, 10);
 
   if (!Number.isInteger(height) || height < 1 || height > maxHeight) {
-    player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.invalidHeight(maxHeight)}`);
+    sendFc(player, messages.invalidHeight(maxHeight));
     return;
   }
 
@@ -106,7 +115,7 @@ export function openCopyMenu(player) {
   showCopyHeightMenu(player).catch((error) => {
     console.warn(`[FC] copy menu failed: ${error?.message ?? error}`);
     if (player?.isValid) {
-      player.sendMessage(`${CONFIG.messages.prefix} メニューを開けませんでした`);
+      sendFc(player, getMessages(player).menuOpenFailed);
     }
   });
 }

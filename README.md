@@ -17,6 +17,12 @@ Minecraft Bedrock Edition 向け Script API アドオンです。
 - ブロックの向き・状態は `BlockPermutation` で保持（チェスト中身・看板文字などの BlockEntity は MVP 対象外）
 - 最大コピー高さ: **384 ブロック**（ワールド下限も考慮）
 
+## 言語
+
+- ゲーム言語が **日本語** のとき → 日本語のチャット・メニュー
+- それ以外 → **英語**（海外向けデフォルト）
+- アイテム名は `en_US` / `ja_JP` の言語ファイルに対応
+
 ## 必要環境
 
 - Minecraft Bedrock Edition **1.21 以降**（**Minecraft Launcher / 統合版**）

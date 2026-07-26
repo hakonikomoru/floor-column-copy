@@ -1,5 +1,6 @@
 import { world, system, ItemStack } from "@minecraft/server";
 import { CONFIG } from "./config.js";
+import { getMessages, sendFc } from "./i18n.js";
 import { openCopyMenu } from "./ui.js";
 import { pasteColumn } from "./paste.js";
 
@@ -24,7 +25,7 @@ export function giveWands(player) {
 
   const inventory = player.getComponent("inventory")?.container;
   if (!inventory) {
-    player.sendMessage(`${CONFIG.messages.prefix} インベントリを取得できません`);
+    sendFc(player, getMessages(player).inventoryUnavailable);
     return;
   }
 
@@ -41,7 +42,7 @@ export function giveWands(player) {
   }
 
   player.setDynamicProperty(CONFIG.dynamicProperties.starterGiven, true);
-  player.sendMessage(`${CONFIG.messages.prefix} ${CONFIG.messages.giveDone}`);
+  sendFc(player, getMessages(player).giveDone);
 }
 
 /**
@@ -64,8 +65,9 @@ function tryGiveStarterWands(player, options = {}) {
  * @param {import("@minecraft/server").Player} player
  */
 function showHelp(player) {
-  for (const line of CONFIG.messages.help) {
-    player.sendMessage(`${CONFIG.messages.prefix} ${line}`);
+  const messages = getMessages(player);
+  for (const line of messages.help) {
+    sendFc(player, line);
   }
 }
 
@@ -320,11 +322,11 @@ function registerFcCustomCommands(initEvent) {
   }
 
   const specs = [
-    ["fc:give", "杖を配布", "give"],
-    ["fc:menu", "コピーメニュー", "menu"],
-    ["fc:copy", "コピーメニュー", "menu"],
-    ["fc:paste", "貼り付け", "paste"],
-    ["fc:help", "ヘルプ", "help"],
+    ["fc:give", "Give copy and paste wands", "give"],
+    ["fc:menu", "Open copy height menu", "menu"],
+    ["fc:copy", "Open copy height menu", "menu"],
+    ["fc:paste", "Paste copied column", "paste"],
+    ["fc:help", "Show Floor Column Copy help", "help"],
   ];
 
   for (const [name, description, action] of specs) {
@@ -408,12 +410,14 @@ function registerGameEvents() {
   console.warn("[FC] game events registered");
 }
 
-function getReadyLines() {
-  const lines = [`${CONFIG.messages.ready}`];
-  lines.push("コピーの杖を使用 → 高さ選択 / 貼り付けの杖を使用 → 即貼り付け");
-  lines.push("/function fc/give または /fc:give で杖を入手");
+/**
+ * @param {import("@minecraft/server").Player} player
+ */
+function getReadyLines(player) {
+  const messages = getMessages(player);
+  const lines = [messages.ready, messages.readyHintUse, messages.readyHintGive];
   if (chatHandlerMode === "none") {
-    lines.push("(!fc は Beta APIs が必要です)");
+    lines.push(messages.readyHintBeta);
   }
   return lines;
 }
@@ -421,8 +425,8 @@ function getReadyLines() {
 function announceReady() {
   for (const player of world.getPlayers()) {
     try {
-      for (const line of getReadyLines()) {
-        player.sendMessage(`${CONFIG.messages.prefix} ${line}`);
+      for (const line of getReadyLines(player)) {
+        sendFc(player, line);
       }
     } catch (error) {
       console.warn(`[FC] ready message failed: ${error?.message ?? error}`);
@@ -494,8 +498,8 @@ world.afterEvents.playerSpawn.subscribe((event) => {
       return;
     }
 
-    for (const line of getReadyLines()) {
-      player.sendMessage(`${CONFIG.messages.prefix} ${line}`);
+    for (const line of getReadyLines(player)) {
+      sendFc(player, line);
     }
 
     tryGiveStarterWands(player);

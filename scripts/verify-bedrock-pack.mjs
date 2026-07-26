@@ -32,6 +32,7 @@ function checkPackRoot(label, packRoot, kind) {
           "pack_icon.png",
           "scripts/main.js",
           "scripts/ui.js",
+          "scripts/i18n.js",
           "functions/fc/give.mcfunction",
           "functions/fc/menu.mcfunction",
         ]
