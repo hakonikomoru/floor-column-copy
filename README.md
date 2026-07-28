@@ -8,7 +8,8 @@ Minecraft Bedrock Edition 向け Script API アドオンです。
 ![Floor Column Copy 説明画像（日本語）](docs/images/description_ja.png)
 
 説明画像（英語）: [docs/images/description_en.png](docs/images/description_en.png)  
-配布・紹介文: [docs/addon-description.md](docs/addon-description.md)
+配布・紹介文: [docs/addon-description.md](docs/addon-description.md)  
+BOOTH 商品情報（コピペ用）: [docs/booth-listing.md](docs/booth-listing.md)
 
 ## 機能
 
@@ -87,6 +88,7 @@ Minecraft Bedrock Edition 向け Script API アドオンです。
 | --- | --- |
 | [docs/project-sync.md](docs/project-sync.md) | **ChatGPT / AI 向け**の仕様・構成の正 |
 | [docs/addon-description.md](docs/addon-description.md) | 配布・紹介用（説明画像・短文） |
+| [docs/booth-listing.md](docs/booth-listing.md) | **BOOTH** 商品名・紹介文・タグのコピペ用 |
 | [docs/bedrock-dev-notes.md](docs/bedrock-dev-notes.md) | Launcher 導入・トラブルシュート |
 
 仕様を変えたら `npm run sync:project-docs` で `project-sync.md` の自動セクションを更新してください。
@@ -97,6 +99,7 @@ Minecraft Bedrock Edition 向け Script API アドオンです。
 AGENTS.md
 docs/
   addon-description.md
+  booth-listing.md
   bedrock-dev-notes.md
   images/
     description_ja.png
@@ -105,6 +108,7 @@ docs/
 tests/
   project-sync-core.test.mjs
 scripts/
+  pack-mcaddon.mjs
   project-sync-core.mjs
   sync-project-docs.mjs
   install-bedrock-pack.mjs
@@ -122,6 +126,7 @@ behavior_packs/floor_column_copy/
   scripts/
     main.js
     config.js
+    i18n.js
     storage.js
     copy.js
     paste.js
@@ -138,6 +143,20 @@ resource_packs/floor_column_copy/
       copy_wand.png
       paste_wand.png
 ```
+
+## 販売・配布（BOOTH）
+
+```bash
+npm run pack:mcaddon
+```
+
+生成物（`dist/`）:
+
+- `FloorColumnCopy_vX.Y.Z.zip` … **BOOTH の作品ファイル（zip のみ可の場合）**
+- `FloorColumnCopy_vX.Y.Z.mcaddon` … 同内容
+- `README_BUYER.txt` … 購入者向け導入文
+
+商品名・紹介文・タグのコピペ用: [docs/booth-listing.md](docs/booth-listing.md)
 
 ## 注意
 

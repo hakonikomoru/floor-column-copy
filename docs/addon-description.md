@@ -69,3 +69,25 @@ By **komolab - Komorabo -**
 Minecraft, Bedrock, 統合版, アドオン, 建築, コピー, 貼り付け, copy, paste,
 creative, building, wand, column, クリエイティブ
 ```
+
+---
+
+## BOOTH 販売ファイル
+
+作品ファイルには次をアップロードしてください。
+
+```bash
+npm run pack:mcaddon
+```
+
+| ファイル | 用途 |
+| --- | --- |
+| `dist/FloorColumnCopy_v*.zip` | **BOOTH 作品ファイル（zip のみ可の場合）** |
+| `dist/FloorColumnCopy_v*.mcaddon` | 同内容（.mcaddon が上げられる場合） |
+| `dist/README_BUYER.txt` | 購入者向け導入手順 |
+| `docs/images/description_ja.png` | 日本語の紹介画像（サムネイル推奨） |
+| `docs/images/description_en.png` | 英語の紹介画像 |
+
+**BOOTH 商品名・紹介文・タグのコピペ用:** [booth-listing.md](./booth-listing.md)
+
+購入者は ZIP を `.mcaddon` にリネームしてダブルクリック、または展開して `floor_column_copy_bp` / `floor_column_copy_rp` を配置 → ワールドでビヘイビア＋リソース両方を有効化します。

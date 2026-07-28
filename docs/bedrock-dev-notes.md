@@ -45,8 +45,15 @@
 | `npm run verify:bedrock-pack` | 配置確認 |
 | `npm run sync:bedrock-world-pack` | 適用済みワールドへコピー同期 |
 | `npm run dev:bedrock` | ファイル監視 → 自動同期 |
+| `npm run pack:mcaddon` | BOOTH 用 `.mcaddon` / `.zip` を `dist/` に生成 |
 
 `sync` / `dev:bedrock` はスクリプト編集を即反映したいときだけ使います。通常プレイでは不要です。
+
+### BOOTH 配布
+
+- 作品ファイル: `dist/FloorColumnCopy_v*.zip`（または `.mcaddon`）
+- 商品名・紹介文・タグ: [booth-listing.md](./booth-listing.md)
+- 説明画像・短文: [addon-description.md](./addon-description.md)
 
 ---
 

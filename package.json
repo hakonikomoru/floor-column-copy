@@ -13,6 +13,7 @@
     "verify:bedrock-pack": "node scripts/verify-bedrock-pack.mjs",
     "sync:bedrock-world-pack": "node scripts/sync-bedrock-world-pack.mjs",
     "watch:bedrock-world-pack": "node scripts/watch-bedrock-world-pack.mjs",
+    "pack:mcaddon": "node scripts/pack-mcaddon.mjs",
     "dev:bedrock": "node scripts/watch-bedrock-world-pack.mjs"
   }
 }

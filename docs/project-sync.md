@@ -30,6 +30,7 @@
 | --- | --- | --- |
 | [README.md](../README.md) | 開発者・プレイヤー | 導入・使い方・コマンド早見 |
 | [addon-description.md](./addon-description.md) | 配布・紹介 | 説明画像・短文コピペ用 |
+| [booth-listing.md](./booth-listing.md) | 販売（BOOTH） | 商品名・紹介文・タグ・フォーム項目のコピペ用 |
 | [bedrock-dev-notes.md](./bedrock-dev-notes.md) | 開発者 | Launcher パス・トラブルシュート |
 | **project-sync.md**（本ファイル） | AI / ChatGPT | 構成・仕様・実装の正 |
 
