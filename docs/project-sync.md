@@ -4,7 +4,7 @@
 > 人間向けの概要は [README.md](../README.md)、Launcher 手順は [bedrock-dev-notes.md](./bedrock-dev-notes.md)。
 
 <!-- sync:auto:meta:start -->
-最終更新の想定リポジトリ: `hakonikomoru/floor-column-copy`（`main`・`e9f7057`・2026-07-26・`npm run sync:project-docs` 自動反映）
+最終更新の想定リポジトリ: `hakonikomoru/floor-column-copy`（`main`・`afa55b1`・2026-07-28・`npm run sync:project-docs` 自動反映）
 <!-- sync:auto:meta:end -->
 
 ---
@@ -77,12 +77,14 @@ floor-column-copy/
 ├── docs/
 │   ├── addon-description.md
 │   ├── bedrock-dev-notes.md
+│   ├── booth-listing.md
 │   ├── images/
 │   │   ├── description_en.png
 │   │   └── description_ja.png
 │   └── project-sync.md
 ├── scripts/
 │   ├── install-bedrock-pack.mjs
+│   ├── pack-mcaddon.mjs
 │   ├── project-sync-core.mjs
 │   ├── sync-bedrock-world-pack-lib.mjs
 │   ├── sync-bedrock-world-pack.mjs
